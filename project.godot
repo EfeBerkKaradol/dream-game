@@ -7,6 +7,8 @@ config/name="Rüya Postası"
 config/description="Bölüm 1 prototipi: Fırın Sokağı"
 run/main_scene="res://scenes/title.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+boot_splash/bg_color=Color(0.12, 0.14, 0.27, 1)
+boot_splash/show_image=false
 
 [autoload]
 
@@ -21,6 +23,10 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=4
 
+[input_devices]
+
+pointing/emulate_mouse_from_touch=true
+
 [gui]
 
 theme/custom_font="res://assets/fonts/nunito_bold.tres"
@@ -30,3 +36,4 @@ theme/custom_font="res://assets/fonts/nunito_bold.tres"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.12, 0.14, 0.27, 1)
+textures/vram_compression/import_etc2_astc=true

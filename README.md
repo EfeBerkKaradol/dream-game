@@ -36,4 +36,4 @@ Görsel kurallar için: [docs/GORSEL_DIL.md](docs/GORSEL_DIL.md)
 - [ ] 3–5 çocuğa oynat; nerede takıldıklarını not et.
 - [ ] Nil, Pırıl ve Fırın Sokağı için görsel stil (Krita ya da Inkscape).
 - [ ] Pırıl ve Halim için kendi sesinle seslendirme (Audacity).
-- [ ] Web'e dışa aktarıp itch.io'da ücretsiz test sürümü yayınlamak (Godot: Editor > Manage Export Templates, sonra Project > Export > Web).
+- [ ] itch.io'da ücretsiz web sürümünü yayınlamak: derleme ve sayfa ayarları [docs/ITCH.md](docs/ITCH.md) içinde.
