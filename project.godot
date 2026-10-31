@@ -21,8 +21,12 @@ window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 window/handheld/orientation=4
 
+[gui]
+
+theme/custom_font="res://assets/fonts/nunito_bold.tres"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-environment/defaults/default_clear_color=Color(0.08, 0.1, 0.25, 1)
+environment/defaults/default_clear_color=Color(0.12, 0.14, 0.27, 1)

@@ -2,11 +2,13 @@ extends Node
 ## Oyunun kalıcı durumu: toplanan rüyalar, teslimler, değirmen ilerlemesi.
 
 const RESIDENTS := {
-	"simit": {"name": "Simitçi Halim", "color": Color("e8a94d")},
-	"balik": {"name": "Balıkçı Ruhi", "color": Color("4da3e8")},
-	"fener": {"name": "Fenerci Leyla", "color": Color("f06b6b")},
+	"simit": {"name": "Simitçi Halim", "color": Art.APRICOT},
+	"balik": {"name": "Balıkçı Ruhi", "color": Art.DUSTY_BLUE},
+	"fener": {"name": "Fenerci Leyla", "color": Art.ROSE},
 }
 const MILL_PARTS := 5
+## Rüyalar bu sırayla oynanır; her rüya bitince sıradakine geçilir.
+const DREAMS := ["dream_clouds", "dream_whale", "dream_light"]
 
 var collected: Array[String] = []
 var delivered: Array[String] = []
@@ -21,6 +23,12 @@ func reset() -> void:
 	dream_cards.clear()
 	mill_progress = 0
 	stars = 0
+
+
+## Bir rüya bitince sıradaki rüyaya, hepsi bitince sabaha geçer.
+func next_after(dream: String) -> String:
+	var i := DREAMS.find(dream)
+	return DREAMS[i + 1] if i >= 0 and i + 1 < DREAMS.size() else "morning"
 
 
 func go(scene: String) -> void:

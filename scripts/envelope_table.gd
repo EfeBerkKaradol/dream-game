@@ -80,8 +80,8 @@ func _check_done() -> void:
 	if GameState.delivered.size() < envelopes.size():
 		UI.say(bubble, "Pırıl", "Doğru zarf! Çok güzel.")
 		return
-	UI.say(bubble, "Pırıl", "Bütün zarflar hazır! Ama Simitçi Halim'in rüyası çok karışık. Hadi içine girip düzeltelim!")
-	var b := UI.big_button(layer, "Rüyaya gir", Color("9b6be0"))
+	UI.say(bubble, "Pırıl", "Bütün zarflar hazır! Ama rüyalar çok karışık. Hadi tek tek içlerine girip düzeltelim!")
+	var b := UI.big_button(layer, "Rüyaya gir", Color("8f7bc0"))
 	b.pressed.connect(func(): GameState.go("dream_clouds"))
 
 
@@ -96,11 +96,18 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var size := get_viewport_rect().size
-	# postane odası ve masa
-	draw_rect(Rect2(Vector2.ZERO, size), Color("2c2348"))
-	draw_circle(Vector2(size.x / 2, 0), 520, Color(1, 0.85, 0.5, 0.06))
-	draw_rect(Rect2(0, 380, size.x, size.y - 380), Color("7a4e2d"))
-	draw_rect(Rect2(0, 380, size.x, 16), Color("94623a"))
+	# postane odası: sıcak lamba ışığı, raflar ve ahşap masa
+	Art.gradient(self, Rect2(0, 0, size.x, 400), Color("3a3560"), Color("4d4672"))
+	Art.glow(self, Vector2(size.x / 2, 40), 620, Color("ffdca0"), 0.5)
+	for k in 3:
+		var sx := 80 + k * 400
+		Art.rrect(self, Rect2(sx, 90 + k * 14, 220, 12), Color("6b5a7a"), 6)
+		for j in 4:
+			Art.rrect(self, Rect2(sx + 14 + j * 50, 50 + k * 14, 36, 40), [Art.ROSE, Art.BUTTER, Art.SAGE, Art.DUSTY_BLUE][(j + k) % 4].darkened(0.25), 6)
+	Art.gradient(self, Rect2(0, 380, size.x, size.y - 380), Color("a8774f"), Color("8c6142"))
+	Art.rrect(self, Rect2(-20, 372, size.x + 40, 22), Color("b98a60"), 10)
+	for k in 5:
+		draw_line(Vector2(0, 430 + k * 60), Vector2(size.x, 430 + k * 60), Color(Art.INK, 0.06), 2, true)
 	for e in envelopes:
 		_draw_envelope(e)
 	for p in pieces:
@@ -108,32 +115,27 @@ func _draw() -> void:
 			continue
 		var pos: Vector2 = p.pos
 		if p != dragging:
-			pos += Vector2(0, sin(t * 2.0 + pos.x) * 6)
-		var col: Color = GameState.RESIDENTS[p.kind].color
-		draw_circle(pos, 56, Color(col, 0.25))
-		draw_circle(pos, 44, Color(col, 0.5))
-		draw_arc(pos, 44, 0, TAU, 40, Color.WHITE, 3)
-		Art.draw_icon(self, p.kind, pos, 34)
-	for s in sparkles:
-		draw_circle(s.pos, 5 * s.life / 0.7 + 1, Color("fff3b0"))
-	Art.draw_piril(self, Vector2(1150, 200 + sin(t * 2) * 12), t)
+			pos += Vector2(0, sin(t * 1.3 + pos.x) * 5)
+		Art.draw_fragment(self, p.kind, pos, t, GameState.RESIDENTS[p.kind].color)
+	for sp in sparkles:
+		Art.draw_star(self, sp.pos, 8 * sp.life / 0.7 + 2)
+	Art.draw_piril(self, Vector2(1150, 220 + sin(t * 1.5) * 10), t)
 
 
 func _draw_envelope(e: Dictionary) -> void:
 	var c: Vector2 = e.pos
 	var r := Rect2(c - ENV_SIZE / 2, ENV_SIZE)
-	draw_rect(Rect2(r.position + Vector2(6, 8), r.size), Color(0, 0, 0, 0.25))
-	draw_rect(r, Color("fff4d6"))
-	var tl := r.position
-	var tr := r.position + Vector2(r.size.x, 0)
+	Art.rrect(self, r, Art.CREAM, 12, 2, Color("e0cfae"), 10)
+	var tl := r.position + Vector2(6, 6)
+	var tr := r.position + Vector2(r.size.x - 6, 6)
 	if e.filled:
-		draw_colored_polygon(PackedVector2Array([tl, tr, c + Vector2(0, 10)]), Color("f0dcae"))
-		draw_circle(c + Vector2(0, 10), 18, Color("c43b3b"))
-		draw_circle(c + Vector2(0, 10), 10, Color("e05555"))
+		Art.blob(self, PackedVector2Array([tl, tr, c + Vector2(0, 14)]), Color("f1e3c6"), 2)
+		Art.dot(self, c + Vector2(0, 14), 18, Color("c97a72"))
+		Art.dot(self, c + Vector2(0, 14), 10, Color("dd948b"))
 	else:
-		draw_polyline(PackedVector2Array([tl, c + Vector2(0, 10), tr]), Color("c9a86a"), 4)
+		draw_polyline(PackedVector2Array([tl, c + Vector2(0, 14), tr]), Color("d5bf94"), 3, true)
 	# pul: zarfın kime gideceğini gösteren resim
-	var stamp := Rect2(tr + Vector2(-78, 10), Vector2(66, 66))
-	draw_rect(stamp, Color.WHITE)
-	draw_rect(stamp, GameState.RESIDENTS[e.kind].color, false, 4)
-	Art.draw_icon(self, e.kind, stamp.get_center(), 26)
+	var col: Color = GameState.RESIDENTS[e.kind].color
+	var stamp := Rect2(tr + Vector2(-72, 6), Vector2(64, 64))
+	Art.rrect(self, stamp, Color("fffaf0"), 8, 4, col)
+	Art.draw_icon(self, e.kind, stamp.get_center(), 24)

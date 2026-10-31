@@ -30,12 +30,12 @@ class BagSlots extends Control:
 	var kinds: Array[String] = []
 
 	func _draw() -> void:
-		draw_rect(Rect2(0, 0, 250, 90), Color(0, 0, 0, 0.35))
+		Art.rrect(self, Rect2(0, 0, 250, 90), Color("2f2c4f", 0.6), 24, 3, Color(Art.CREAM, 0.35))
 		for i in 3:
 			var c := Vector2(45 + i * 80, 45)
-			draw_circle(c, 32, Color(1, 1, 1, 0.15))
+			Art.dot(self, c, 30, Color(Art.CREAM, 0.14))
 			if i < kinds.size():
-				Art.draw_icon(self, kinds[i], c, 34)
+				Art.draw_icon(self, kinds[i], c, 32)
 
 
 func _ready() -> void:
@@ -119,47 +119,52 @@ func _take(f: Dictionary) -> void:
 		done = true
 		Sfx.play("success")
 		UI.say(bubble, "Pırıl", "Hepsi çantada! Şimdi postaneye dönüp zarflara koyalım.")
-		var b := UI.big_button(bubble.panel.get_parent(), "Postaneye git", Color("4caf6a"))
+		var b := UI.big_button(bubble.panel.get_parent(), "Postaneye git", Color("6fa27a"))
 		b.pressed.connect(func(): GameState.go("envelope_table"))
 
 
 func _draw() -> void:
-	# gökyüzü ve yıldızlar
-	draw_rect(Rect2(-400, 0, WORLD_W + 800, 720), Color("141a40"))
-	draw_rect(Rect2(-400, 300, WORLD_W + 800, 300), Color("1b2252"))
+	var cx := cam.get_screen_center_position().x if cam else nil_x
+	# gökyüzü (kameraya sabit) ve yavaş parlayan yıldızlar
+	Art.gradient(self, Rect2(cx - 1100, 0, 2200, 720), Art.NIGHT_TOP, Art.NIGHT_BOTTOM)
 	for i in stars.size():
-		draw_circle(stars[i], 1.8, Color(1, 1, 1, 0.4 + 0.4 * sin(t * 1.5 + i)))
-	draw_circle(Vector2(1300, 250), 55, Color("fff3c4"))
-	draw_circle(Vector2(1324, 238), 48, Color("141a40"))
-	# tepe ve bozuk değirmen (arka plan)
-	draw_colored_polygon(Art.ellipse(Vector2(2250, 760), 520, 330), Color("1f3a35"))
-	Art.draw_mill(self, Vector2(2250, 450), true, 0.4)
-	# deniz
-	draw_rect(Rect2(-400, 520, WORLD_W + 800, 80), Color("23407a"))
-	for i in 30:
-		var x := -300 + i * 110 + sin(t + i) * 10
-		draw_line(Vector2(x, 548 + (i % 3) * 14), Vector2(x + 40, 548 + (i % 3) * 14), Color(1, 1, 1, 0.15), 3)
+		var sp := stars[i] + Vector2(cx * 0.9, 0)
+		Art.dot(self, sp, 1.6, Color("f3e9c6", 0.3 + 0.25 * sin(t * 0.7 + i)))
+	var moon := Vector2(cx + 300, 235)
+	Art.glow(self, moon, 150, Color("fbeec4"), 0.6)
+	Art.dot(self, moon, 50, Color("fbeec4"))
+	Art.dot(self, moon + Vector2(16, -9), 43, Art.NIGHT_TOP.lerp(Art.NIGHT_BOTTOM, 0.3))
+	# uzak tepeler ve değirmen (yavaş kayar: derinlik hissi)
+	var far := cx * 0.6
+	Art.hills(self, far - 1000, far + WORLD_W, 470, 70, 0.003, 0.5, Color("323866"))
+	Art.draw_mill(self, Vector2(1050 + far, 440), true, 0.4)
+	var mid := cx * 0.3
+	Art.hills(self, mid - 1000, mid + WORLD_W + 800, 520, 40, 0.005, 2.0, Color("2f4a58"))
+	# deniz: yumuşak geçiş ve ay yansıması
+	Art.gradient(self, Rect2(-400, 512, WORLD_W + 800, 90), Color("3a5a8a"), Color("2e4670"))
+	for i in 34:
+		var x := -300 + i * 100 + sin(t * 0.6 + i) * 8
+		var y := 536 + (i % 3) * 18
+		draw_line(Vector2(x, y), Vector2(x + 36, y), Color("f3e9c6", 0.12), 3, true)
+	for k in 5:
+		draw_line(Vector2(moon.x - 30 + k * 4, 530 + k * 14), Vector2(moon.x + 30 - k * 4, 530 + k * 14), Color("fbeec4", 0.25 - k * 0.04), 4, true)
 	# evler: postane, simitçi, balıkçı, fenerci
-	Art.draw_house(self, 260, GROUND, 220, 170, Color("5a7bd6"), Color("2d3f7a"), "zarf", true)
-	Art.draw_house(self, 820, GROUND, 200, 160, Color("e0b07a"), Color("8a4b2b"), "simit", true)
-	Art.draw_house(self, 1450, GROUND, 200, 150, Color("7ab8d6"), Color("2b5a8a"), "balik", true)
-	Art.draw_house(self, 1950, GROUND, 190, 200, Color("e7a0a0"), Color("8a2b3b"), "fener", true)
-	# sokak
-	draw_rect(Rect2(-400, GROUND, WORLD_W + 800, 120), Color("4a3f5c"))
-	for i in 40:
-		draw_rect(Rect2(-380 + i * 90, GROUND + 40, 50, 8), Color(1, 1, 1, 0.08))
+	Art.draw_house(self, 260, GROUND, 220, 170, Color("8ea6d8"), Color("4f5f9a"), "zarf", true)
+	Art.draw_house(self, 820, GROUND, 200, 160, Color("e6c39a"), Color("a86f58"), "simit", true)
+	Art.draw_house(self, 1450, GROUND, 200, 150, Color("a9cbdc"), Color("5f86a8"), "balik", true)
+	Art.draw_house(self, 1950, GROUND, 190, 200, Color("e8b9b4"), Color("a8686e"), "fener", true)
+	for lx in [540.0, 1140.0, 1700.0, 2250.0]:
+		Art.draw_lamp(self, lx, GROUND, true)
+	# taş sokak
+	Art.gradient(self, Rect2(-400, GROUND, WORLD_W + 800, 120), Color("5e5878"), Color("4e4866"))
+	for i in 60:
+		var bx := -380 + i * 60 + (i % 2) * 30
+		Art.rrect(self, Rect2(bx, GROUND + 30 + (i % 2) * 34, 44, 18), Color("6a6486"), 9)
 	# rüya parçaları
 	for f in fragments:
 		if f.taken:
 			continue
-		var p: Vector2 = f.pos + Vector2(0, sin(t * 2.0 + f.pos.x) * 10)
-		var col: Color = GameState.RESIDENTS[f.kind].color
-		draw_circle(p, 62, Color(col, 0.15))
-		draw_circle(p, 46, Color(col, 0.35))
-		draw_arc(p, 46, 0, TAU, 40, Color(1, 1, 1, 0.7), 3)
-		Art.draw_icon(self, f.kind, p, 36)
-		for k in 3:
-			var a := t * 2.0 + k * TAU / 3.0
-			draw_circle(p + Vector2(cos(a), sin(a)) * 58, 3, Color(1, 1, 1, 0.8))
+		var p: Vector2 = f.pos + Vector2(0, sin(t * 1.3 + f.pos.x) * 8)
+		Art.draw_fragment(self, f.kind, p, t, GameState.RESIDENTS[f.kind].color)
 	Art.draw_nil(self, Vector2(nil_x, GROUND), t, absf(target_x - nil_x) > 4.0, facing)
 	Art.draw_piril(self, piril, t, 1.3 if idle > HINT_AFTER else 1.0)
