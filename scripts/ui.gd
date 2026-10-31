@@ -5,10 +5,14 @@ class_name UI
 static func bubble(layer: CanvasLayer, width := 860.0) -> Dictionary:
 	var panel := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color(1, 1, 1, 0.95)
+	sb.bg_color = Color(Art.CREAM, 0.96)
 	sb.set_corner_radius_all(28)
-	sb.border_color = Color("f5c84b")
-	sb.set_border_width_all(5)
+	sb.border_color = Color("e6c79a")
+	sb.set_border_width_all(4)
+	sb.shadow_color = Color(Art.INK, 0.18)
+	sb.shadow_size = 10
+	sb.shadow_offset = Vector2(0, 4)
+	sb.anti_aliasing = true
 	sb.content_margin_left = 30
 	sb.content_margin_right = 30
 	sb.content_margin_top = 14
@@ -17,13 +21,13 @@ static func bubble(layer: CanvasLayer, width := 860.0) -> Dictionary:
 	var box := VBoxContainer.new()
 	panel.add_child(box)
 	var who := Label.new()
-	who.add_theme_font_size_override("font_size", 24)
-	who.add_theme_color_override("font_color", Color("c27b00"))
+	who.add_theme_font_size_override("font_size", 22)
+	who.add_theme_color_override("font_color", Color("b5763a"))
 	box.add_child(who)
 	var text := Label.new()
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(width, 0)
-	text.add_theme_font_size_override("font_size", 32)
+	text.add_theme_font_size_override("font_size", 30)
 	text.add_theme_color_override("font_color", Art.INK)
 	box.add_child(text)
 	# Balon dokunuşları yutmasın; altındaki oyun alanına geçsin.
@@ -51,24 +55,28 @@ static func big_button(layer: CanvasLayer, text: String, color: Color) -> Button
 	b.add_theme_font_size_override("font_size", 40)
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var sb := StyleBoxFlat.new()
-		sb.bg_color = color.darkened(0.15) if state == "pressed" else color
+		sb.bg_color = color.darkened(0.1) if state == "pressed" else color
+		sb.anti_aliasing = true
+		sb.shadow_color = Color(Art.INK, 0.22)
+		sb.shadow_size = 8
+		sb.shadow_offset = Vector2(0, 4)
 		sb.set_corner_radius_all(40)
 		sb.content_margin_left = 48
 		sb.content_margin_right = 48
 		sb.content_margin_top = 18
 		sb.content_margin_bottom = 18
-		sb.border_color = Color(1, 1, 1, 0.8)
+		sb.border_color = Color(Art.CREAM, 0.9)
 		sb.set_border_width_all(4)
 		b.add_theme_stylebox_override(state, sb)
 	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		b.add_theme_color_override(c, Color.WHITE)
+		b.add_theme_color_override(c, Art.CREAM)
 	layer.add_child(b)
 	b.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM, Control.PRESET_MODE_MINSIZE, 36)
 	b.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	b.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	b.pivot_offset = b.size / 2
+	b.resized.connect(func(): b.pivot_offset = b.size / 2)
 	var tw := b.create_tween().set_loops()
-	tw.tween_property(b, "scale", Vector2(1.06, 1.06), 0.6).set_trans(Tween.TRANS_SINE)
-	tw.tween_property(b, "scale", Vector2.ONE, 0.6).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(b, "scale", Vector2(1.03, 1.03), 1.2).set_trans(Tween.TRANS_SINE)
+	tw.tween_property(b, "scale", Vector2.ONE, 1.2).set_trans(Tween.TRANS_SINE)
 	b.pressed.connect(func(): Sfx.play("tap"))
 	return b

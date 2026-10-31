@@ -100,8 +100,8 @@ func _landed(i: int) -> void:
 		finished = true
 		Sfx.play("success")
 		UI.say(bubble, "Simitçi Halim", "Rüyamdaki dev simit! İşte aradığım buydu!")
-		var b := UI.big_button(layer, "Sabah oldu", Color("f0a03c"))
-		b.pressed.connect(func(): GameState.go("morning"))
+		var b := UI.big_button(layer, "Sıradaki rüya", Color("8f7bc0"))
+		b.pressed.connect(func(): GameState.go(GameState.next_after("dream_clouds")))
 
 
 func _update_stars() -> void:
@@ -117,46 +117,38 @@ func _process(delta: float) -> void:
 func _draw() -> void:
 	var size := get_viewport_rect().size
 	# pastel rüya gökyüzü
-	var bands := [Color("ffd6e0"), Color("ffe3d1"), Color("fff0c9"), Color("e6f0ff")]
-	for i in bands.size():
-		draw_rect(Rect2(0, size.y * i / bands.size(), size.x, size.y / bands.size() + 1), bands[i])
+	Art.gradient(self, Rect2(0, 0, size.x, size.y * 0.55), Color("e9dcf0"), Color("f8e3d6"))
+	Art.gradient(self, Rect2(0, size.y * 0.55, size.x, size.y * 0.45 + 1), Color("f8e3d6"), Color("e3ecf3"))
 	for i in 6:
-		Art.draw_cloud(self, Vector2(fmod(i * 260 + t * 15, size.x + 200) - 100, 120 + (i % 3) * 120), 160, Color(1, 1, 1, 0.35))
+		Art.draw_cloud(self, Vector2(fmod(i * 260 + t * 8, size.x + 200) - 100, 120 + (i % 3) * 120), 160, Color(1, 1, 1, 0.3))
 	# hedef: dev simit
 	Art.draw_simit(self, Vector2(1150, 110) + Vector2(0, sin(t * 1.5) * 6), 70)
 	for i in clouds.size():
 		var c: Vector2 = clouds[i]
-		var col := Color.WHITE
+		var col := Color("fbf8f3")
 		if i == GRUMPY:
-			col = Color("ffc2d6") if grumpy_happy else Color("9aa0b0")
-			c += Vector2(sin(t * 40.0) * 8.0 * wobble, 0)
+			col = Color("f4cfd8") if grumpy_happy else Color("a9adbd")
+			c += Vector2(sin(t * 18.0) * 6.0 * wobble, 0)
 		Art.draw_cloud(self, c, 170, col)
 		if i == current + 1 and not hopping and not finished:
-			draw_arc(c + Vector2(0, -6), 95 + sin(t * 5) * 6, 0, TAU, 48, Color(1, 0.85, 0.3, 0.8), 5)
+			Art.glow(self, c, 120, Art.BUTTER, 0.5 + 0.2 * sin(t * 2.0))
+			draw_arc(c + Vector2(0, -6), 95 + sin(t * 2.0) * 4, 0, TAU, 64, Color(Art.BUTTER, 0.9), 4, true)
 		if i == GRUMPY:
 			_draw_face(c, grumpy_happy)
 		if star_on.get(i, false):
-			_draw_star(c + Vector2(30, -70 + sin(t * 3 + i) * 6), 18)
+			Art.draw_star(self, c + Vector2(30, -70 + sin(t * 1.5 + i) * 5), 18)
 	Art.draw_nil(self, nil_pos, t, false, 1)
-	Art.draw_piril(self, nil_pos + Vector2(-60, -170 + sin(t * 2.5) * 10), t)
+	Art.draw_piril(self, nil_pos + Vector2(-60, -170 + sin(t * 1.5) * 8), t)
 
 
 func _draw_face(c: Vector2, happy: bool) -> void:
-	draw_circle(c + Vector2(-20, -18), 5, Art.INK)
-	draw_circle(c + Vector2(20, -18), 5, Art.INK)
+	Art.dot(self, c + Vector2(-20, -18), 5, Art.INK)
+	Art.dot(self, c + Vector2(20, -18), 5, Art.INK)
 	if happy:
-		draw_arc(c + Vector2(0, -6), 18, 0.2, PI - 0.2, 12, Art.INK, 4)
-		draw_circle(c + Vector2(-34, -6), 7, Color(1, 0.5, 0.6, 0.6))
-		draw_circle(c + Vector2(34, -6), 7, Color(1, 0.5, 0.6, 0.6))
+		draw_arc(c + Vector2(0, -6), 16, 0.25, PI - 0.25, 14, Art.INK, 3.5, true)
+		Art.dot(self, c + Vector2(-34, -6), 8, Color(Art.ROSE, 0.6))
+		Art.dot(self, c + Vector2(34, -6), 8, Color(Art.ROSE, 0.6))
 	else:
-		draw_arc(c + Vector2(0, 8), 16, PI + 0.3, TAU - 0.3, 12, Art.INK, 4)
-		draw_line(c + Vector2(-30, -32), c + Vector2(-12, -26), Art.INK, 4)
-		draw_line(c + Vector2(30, -32), c + Vector2(12, -26), Art.INK, 4)
-
-
-func _draw_star(c: Vector2, r: float) -> void:
-	var pts := PackedVector2Array()
-	for k in 10:
-		var a := -PI / 2 + TAU * k / 10.0
-		pts.append(c + Vector2(cos(a), sin(a)) * (r if k % 2 == 0 else r * 0.45))
-	draw_colored_polygon(pts, Color("ffcc33"))
+		draw_arc(c + Vector2(0, 8), 14, PI + 0.35, TAU - 0.35, 14, Art.INK, 3.5, true)
+		draw_line(c + Vector2(-30, -32), c + Vector2(-13, -27), Art.INK, 3.5, true)
+		draw_line(c + Vector2(30, -32), c + Vector2(13, -27), Art.INK, 3.5, true)

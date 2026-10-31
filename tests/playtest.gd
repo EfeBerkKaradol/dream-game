@@ -135,12 +135,51 @@ func _run() -> void:
 	await shot("dream_done")
 	await press_button()
 	print("scene: ", scene_name())
+	# balina: önce bir yanlış dokunuş (tekrar dinletmeli), sonra doğru şarkılar
+	s = get_tree().current_scene
+	await until(func(): return s.listening)
+	await shot("whale_listening")
+	var first: int = s.ROUNDS[0][0]
+	await tap(s.shells[(first + 1) % 3])
+	await wait(0.3)
+	await shot("whale_retry")
+	for r in s.ROUNDS.size():
+		await until(func(): return s.listening)
+		for k in s.ROUNDS[r]:
+			await tap(s.shells[k])
+			await wait(0.25)
+	await wait(0.6)
+	print("whale finished: ", s.finished)
+	await shot("whale_done")
+	await press_button()
+	print("scene: ", scene_name())
+	s = get_tree().current_scene
+	await wait(0.4)
+	await shot("light_start")
+	await tap(s._cell_pos(Vector2i(2, 1)))
+	await wait(0.4)
+	await shot("light_half")
+	await tap(s._cell_pos(Vector2i(2, 0)))
+	await tap(s._cell_pos(Vector2i(4, 0)))
+	await wait(0.6)
+	print("light solved: ", s.solved)
+	await shot("light_done")
+	await press_button()
+	print("scene: ", scene_name())
 	await wait(0.4)
 	await shot("morning_1")
-	for i in 4:
+	for i in 6:
 		await tap(Vector2(640, 400))
-		await wait(0.8)
+		await wait(0.9)
 		await shot("morning_%d" % (i + 2))
-	print("mill: ", GameState.mill_progress)
+	print("mill: ", GameState.mill_progress, " stars: ", GameState.stars)
 	print("PLAYTEST OK")
 	get_tree().quit()
+
+
+func until(cond: Callable, limit := 15.0) -> void:
+	var waited := 0.0
+	while not cond.call() and waited < limit:
+		await wait(0.1)
+		waited += 0.1
+	assert(cond.call(), "bekleme zaman aşımı")
